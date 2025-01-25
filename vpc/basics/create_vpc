@@ -7,13 +7,13 @@ set -e
 VPC_ID=$(aws ec2 create-vpc \
 --cidr-block "172.1.0.0/16" \
 --tag-specifications 'ResourceType=vpc,Tags=[{Key=Name,Value=my-vpc-3}]' \
---region ca-central-1  \
+--region eu-west-3  \
 --query Vpc.VpcId \
 --output text)
 
 echo "VPC_ID: $VPC_ID"
 
-# Turn on DNS Hostnames
+# # Turn on DNS Hostnames
 aws ec2 modify-vpc-attribute --vpc-id $VPC_ID --enable-dns-hostnames "{\"Value\":true}"
 
 # create an IGW
@@ -38,7 +38,8 @@ SUBNET_ID=$(aws ec2 create-subnet \
 
 echo "SUBNET_ID: $SUBNET_ID"
 
-## auto assign IPv4 addresses
+# auto assign IPv4 addresses
+# command is used to automatically assign public IPs to instances in a subnet.
 
 aws ec2 modify-subnet-attribute --subnet-id $SUBNET_ID --map-public-ip-on-launch
 
@@ -66,5 +67,5 @@ aws ec2 create-route \
 --destination-cidr-block 0.0.0.0/0 \
 --gateway-id $IGW_ID
 
-# Print out delete command
+# # Print out delete command
 echo "./delete_vpc $VPC_ID $IGW_ID $SUBNET_ID $ASSOC_ID $RT_ID"

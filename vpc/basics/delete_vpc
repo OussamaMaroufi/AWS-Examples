@@ -3,10 +3,12 @@
 # VPC IGW SUBNET RT
 
 # Check if the argument is not provided
+# -z is a condition that returns true if the string length is zero.
 if [ -z "$1" ]; then
   echo "Argument not provided."
 else
   export VPC_ID="$1"
+  # VPC_ID it will be an environment variable that is available in the current shell session and any child processes.
 fi
 
 if [ -z "$2" ]; then
@@ -47,7 +49,8 @@ aws ec2 disassociate-route-table --association-id $ASSOC_ID
 aws ec2 delete-subnet --subnet-id $SUBNET_ID
 
 # delete route table
-# aws ec2 delete-route-table --route-table-id $RT_ID
+
+aws ec2 delete-route-table --route-table-id $RT_ID
 
 # delete vpc
 
