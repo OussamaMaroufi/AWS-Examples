@@ -11,3 +11,5 @@ aws cloudformation deploy \
 --no-execute-changeset \
 --region ca-central-1 \
 --stack-name $STACK_NAME
+
+# If a stack creation fails we delete it and then recreate it , if it s sucessfully created we upload a new template 

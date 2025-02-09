@@ -112,6 +112,7 @@ Min 1
 Max 2
 Desired 1
 
+
 ## Ingress with Application Load Balancer via AWS Load Balancer Controller
 
 https://docs.aws.amazon.com/eks/latest/userguide/alb-ingress.html
