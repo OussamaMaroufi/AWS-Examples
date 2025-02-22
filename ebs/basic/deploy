@@ -1,13 +1,12 @@
 #!/usr/bin/env bash
 
-echo "== deploy secrets manager stuff"
 
-STACK_NAME="aws-sm-basic"
+STACK_NAME="aws-ebs-example"
 
 # https://awscli.amazonaws.com/v2/documentation/api/latest/reference/cloudformation/deploy/index.html
 aws cloudformation deploy \
 --template-file template.yaml \
 --capabilities CAPABILITY_NAMED_IAM \
 --no-execute-changeset \
---region ca-central-1 \
+--region eu-west-3 \
 --stack-name $STACK_NAME
