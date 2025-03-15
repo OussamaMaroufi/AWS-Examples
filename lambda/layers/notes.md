@@ -8,8 +8,8 @@ zip -r facker_layer  .
 
 
 aws lambda publish-layer-version \
-  --layer-name my-layer-name \
-  --description "My custom Lambda layer" \
+  --layer-name faker-layer \
+  --description "My Faker  layer" \
   --content S3Bucket=my-awesome-lambda-layers,S3Key=facker_layer.zip \
   --compatible-runtimes python3.12\
   --license-info "MIT"

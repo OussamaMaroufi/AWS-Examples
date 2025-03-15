@@ -6,24 +6,24 @@ Parameters:
   #Backend ------
   InstanceType:
     Type: String
-    # t3: Nitro
-    # t2: Xen
+    # t3: Nitro (a modern, high-performance virtualization system).
+    # t2: Xen (an older virtualization system).
     Default: t3.medium
   ECSAMI:
     Type: String
-    Default: ami-079f772f5bb2f3779
+    Default: ami-06b4bffcd6e4e3549
   BackendPort:
     Type: Number
     Default: 4567
   VpcId:
     Type: String
-    Default: vpc-08f0ec02f7471b018
+    Default: vpc-0289fee4d0dc703b2
   Subnets:
     Type: 'List<AWS::EC2::Subnet::Id>'
     Description: A list of subnets for the Auto Scaling group    
     # ca-central-1a
     # ca-central-1b
-    Default: "subnet-0d8058cb02f147a86,subnet-0e0fd31733061237d"
+    Default: "subnet-0f9983ee20f3cbeb1,subnet-0b82494d45b433555"
 Resources:
   ECSCluster:
     # https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-ecs-cluster.html

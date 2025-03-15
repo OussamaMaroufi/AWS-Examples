@@ -4,8 +4,9 @@ Resources:
   InlineLambda:
     Type: AWS::Serverless::Function
     Properties:
-      Handler: handler  # Corrected: Only the function name is needed for inline code
+      Handler: index.handler  
       Runtime: python3.12
+      PackageType: Zip
       InlineCode: |
         import json
         from faker import Faker
@@ -22,4 +23,4 @@ Resources:
                 'message' : message
             }
       Layers:
-        - arn:aws:lambda:eu-west-3:783764602222:layer:my-layer-name:2
+        - arn:aws:lambda:eu-west-3:783764602222:layer:faker-layer:1
