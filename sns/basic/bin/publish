@@ -2,8 +2,16 @@
 
 set -e
 
-TOPIC_ARN="arn:aws:sns:ca-central-1:982383527471:sns-basisc-lambda-SNSTopic-PX5aIoGcnICj"
+# Get the ARN of the first SNS topic (or filter for a specific topic)
+TOPIC_ARN=$(aws sns list-topics --query "Topics[0].TopicArn" --output text)
 
+# Check if the TOPIC_ARN is empty
+if [ -z "$TOPIC_ARN" ]; then
+  echo "Error: No SNS topics found."
+  exit 1
+fi
+
+# Publish a message to the SNS topic
 aws sns publish \
---topic-arn $TOPIC_ARN \
---message '{ "first_name": "Andrew", "last_name": "Brown" }'
+  --topic-arn "$TOPIC_ARN" \
+  --message '{ "first_name": "Andrew", "last_name": "Brown" }'

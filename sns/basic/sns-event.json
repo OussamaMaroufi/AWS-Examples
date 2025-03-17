@@ -1,0 +1,9 @@
+{
+    "Records": [
+      {
+        "Sns": {
+          "Message": "{\"first_name\": \"Andrew\", \"last_name\": \"Brown\"}"
+        }
+      }
+    ]
+  }
