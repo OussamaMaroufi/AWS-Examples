@@ -4,7 +4,7 @@ echo "== send"
 root_path=$(realpath .)
 message_attributes_path="file://${root_path}/send-message.json"
 
-QUEUE_URL=https://sqs.ca-central-1.amazonaws.com/982383527471/sqs-fifo-MyQueue-TFdtzZeh3R0e.fifo
+QUEUE_URL=https://sqs.eu-west-3.amazonaws.com/783764602222/sqs-fifo-MyQueue-3U9jVonNxfAD.fifo
 
 # https://awscli.amazonaws.com/v2/documentation/api/latest/reference/sqs/send-message.html
 aws sqs send-message \
@@ -13,6 +13,15 @@ aws sqs send-message \
 --message-deduplication-id 1 \
 --message-group-id "hello" \
 --message-attributes $message_attributes_path
+
+#--message-deduplication-id 1:
+#A unique identifier used for deduplication in FIFO queues.
+#If a message with the same message-deduplication-id is sent within the 5-minute deduplication interval, it will be ignored to prevent duplicates.
+#This is required if the queue does not have content-based deduplication enabled.
+#--message-group-id "hello":
+#A tag that groups messages together in a FIFO queue.
+#Messages with the same message-group-id are processed in strict order relative to each other.
+#This is required for FIFO queues to ensure ordered processing.
 
 aws sqs send-message \
 --queue-url $QUEUE_URL \

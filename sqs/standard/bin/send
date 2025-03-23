@@ -4,7 +4,7 @@ echo "== send"
 root_path=$(realpath .)
 message_attributes_path="file://${root_path}/send-message.json"
 
-QUEUE_URL=https://sqs.ca-central-1.amazonaws.com/982383527471/sqs-standard-MyQueue-ONKfvvgwWJo2
+QUEUE_URL=https://sqs.eu-west-3.amazonaws.com/783764602222/sqs-standard-MyQueue-fnJUkYZIl490
 
 
 # https://awscli.amazonaws.com/v2/documentation/api/latest/reference/sqs/send-message.html
@@ -13,6 +13,8 @@ aws sqs send-message \
 --message-body "Hello 1!" \
 --delay-seconds 1 \
 --message-attributes $message_attributes_path
+
+# delay-seconds This means the message will not be available for consumers to process immediately after it is sent to the queue they will be invisible and then will apear to consumers
 
 aws sqs send-message \
 --queue-url $QUEUE_URL \

@@ -3,7 +3,7 @@ require 'pry'
 
 client = Aws::SQS::Client.new
 
-queue_url = "https://sqs.ca-central-1.amazonaws.com/982383527471/sqs-standard-MyQueue-ONKfvvgwWJo2"
+queue_url="https://sqs.eu-west-3.amazonaws.com/783764602222/sqs-standard-MyQueue-fnJUkYZIl490"
 
 resp = client.receive_message({
   queue_url: queue_url,

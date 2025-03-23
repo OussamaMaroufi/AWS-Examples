@@ -12,5 +12,5 @@ aws cloudformation deploy \
 --template-file $template_path \
 --capabilities CAPABILITY_NAMED_IAM \
 --no-execute-changeset \
---region ca-central-1 \
+--region eu-west-3 \
 --stack-name $STACK_NAME

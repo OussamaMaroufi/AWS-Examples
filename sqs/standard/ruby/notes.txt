@@ -1,0 +1,5 @@
+bundle init
+gem "ox"
+gem "aws-sdk-sqs"
+bundle install
+bundle exec ruby send.rb
