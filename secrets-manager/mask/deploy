@@ -10,5 +10,5 @@ aws cloudformation deploy \
 --capabilities CAPABILITY_NAMED_IAM \
 --parameter-overrides MyPassword="!654321gnitesT" \
 --no-execute-changeset \
---region ca-central-1 \
+--region eu-west-3 \
 --stack-name $STACK_NAME

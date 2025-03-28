@@ -9,6 +9,11 @@ aws cloudformation deploy \
 --template-file template.yaml \
 --capabilities CAPABILITY_NAMED_IAM \
 --no-execute-changeset \
---parameter-overrides VpcId="vpc-08f0ec02f7471b018" Subnets="subnet-0e0fd31733061237d,subnet-0377c6b172e2951d4,subnet-0d8058cb02f147a86" \
---region ca-central-1 \
+--parameter-overrides VpcId="vpc-0289fee4d0dc703b2" Subnets="subnet-0f9983ee20f3cbeb1,subnet-0b82494d45b433555,subnet-05346a66197da717c" \
+--region eu-west-3 \
 --stack-name $STACK_NAME
+
+# The --parameter-overrides option in the AWS CLI is used to specify parameter values for a CloudFormation stack during deployment.
+# The --capabilities option in the AWS CLI is used to acknowledge that your CloudFormation stack might create IAM resources with specific permissions. This is required when your CloudFormation template includes resources like IAM roles, policies, or users.
+# to get available postgresql versions: aws rds describe-db-engine-versions --engine postgres --query "DBEngineVersions[].EngineVersion"
+# a lot of value are stored in secret not juste the password nd the username

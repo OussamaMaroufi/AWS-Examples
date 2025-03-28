@@ -1,18 +1,26 @@
-AWSTemplateFormatVersion: "2010-09-09"
+AWSTemplateFormatVersion: '2010-09-09'
 Resources:
   MySecretGenerated:
     # https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-secretsmanager-secret.html
-    Type: 'AWS::SecretsManager::Secret'
+    Type: AWS::SecretsManager::Secret
     Properties:
       # https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-secretsmanager-secret-generatesecretstring.html
       GenerateSecretString:
-        SecretStringTemplate: '{"username": "test-user"}'
-        GenerateStringKey: "password"
+        # Automatically generates a secret value
+        SecretStringTemplate: '{"username": "test-user"}' # {"username": "test-user", "password": "xYz123...abc"}  # Randomly generated
+        GenerateStringKey: password # The key (password) under which the generated secret string will be stored.
         PasswordLength: 30
         ExcludeCharacters: '"@/\'
   MySecretProvided:
     # https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-secretsmanager-secret.html
-    Type: 'AWS::SecretsManager::Secret'
+    Type: AWS::SecretsManager::Secret
     Properties:
       # https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-secretsmanager-secret-generatesecretstring.html
-      SecretString: "Testing123456!"
+      SecretString: |
+        {
+          "apiKey": "abc123",
+          "endpoint": "https://api.example.com",
+          "env": "production"
+        }
+      # Or directly like that 
+      # SecretString: testing123

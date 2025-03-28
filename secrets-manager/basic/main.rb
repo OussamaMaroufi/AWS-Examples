@@ -6,10 +6,10 @@ require 'aws-sdk-secretsmanager'
 require 'pry'
 
 def get_secret
-  client = Aws::SecretsManager::Client.new(region: 'ca-central-1')
+  client = Aws::SecretsManager::Client.new(region: 'eu-west-3')
 
   begin
-    get_secret_value_response = client.get_secret_value(secret_id: 'MySecret-RuV3HAAeO2Dy')
+    get_secret_value_response = client.get_secret_value(secret_id: 'MySecretGenerated-lUs5nZ3e1kHr')
   rescue StandardError => e
     # For a list of exceptions thrown, see
     # https://docs.aws.amazon.com/secretsmanager/latest/apireference/API_GetSecretValue.html

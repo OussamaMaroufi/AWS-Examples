@@ -2,7 +2,7 @@ AWSTemplateFormatVersion: "2010-09-09"
 Parameters:
   MyPassword:
     Type: String
-    NoEcho: true
+    NoEcho: true  # <-- This hides the value in outputs/logs
 Resources:
   MySecretPassed:
     # https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-secretsmanager-secret.html
@@ -10,3 +10,11 @@ Resources:
     Properties:
       # https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-secretsmanager-secret-generatesecretstring.html
       SecretString: !Ref MyPassword
+
+
+# Hides the parameter value in:
+# AWS CloudFormation console outputs
+# AWS CLI responses (describe-stacks)
+# CloudTrail logs
+# Replaces the actual value with ***** (asterisks) in logs/UIs.
+# This prevent sensitive information exposure
