@@ -1,0 +1,76 @@
+AWSTemplateFormatVersion: '2010-09-09'
+# https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-ec2-instance.html
+Parameters:
+  InstanceType:
+    Type: String
+    Default: t3.micro
+  VpcId:
+    Type: String
+    Default: vpc-0289fee4d0dc703b2
+  ImageId:
+    Type: String
+    # eu-west-3 AMI
+    Default: ami-0964b861c5e77f8d0
+  SubnetId:
+    Type: String
+    Default: subnet-0f9983ee20f3cbeb1
+Resources:
+  MyEC2Instance:
+    Type: AWS::EC2::Instance
+    Properties:
+      IamInstanceProfile: !Ref EC2InstanceProfile
+      InstanceType: !Ref InstanceType
+      ImageId: !Ref ImageId
+      NetworkInterfaces:
+        - DeviceIndex: 0
+          SubnetId: !Ref SubnetId
+          AssociatePublicIpAddress: true
+          GroupSet:
+            - !GetAtt SG.GroupId
+          DeleteOnTermination: true
+      Tags:
+      - Key: Name
+        Value: MyEC2Instance
+      - Key: APP
+        Value: MyApp
+      UserData: !Base64 |
+        #!/bin/bash
+        su ec2-user
+        sudo yum update -y
+        sudo yum install -y httpd
+        sudo chwon -R ec2-user:ec2-user /var/www
+        echo "<html><body><h1>Hello from Apache on Amazon Linux 2!</h1></body></html>" > /var/www/html/index.html
+        sudo systemctl start httpd
+        sudo systemctl enable httpd
+  SG:
+    Type: AWS::EC2::SecurityGroup
+    Properties:
+      GroupDescription: Allow http to client host
+      VpcId: !Ref VpcId
+      SecurityGroupIngress:
+        - IpProtocol: -1
+          FromPort: -1
+          ToPort: -1
+          CidrIp: 0.0.0.0/0
+      SecurityGroupEgress:
+        - IpProtocol: -1
+          FromPort: -1
+          ToPort: -1
+          CidrIp: 0.0.0.0/0
+  SSMRole:
+    Type: AWS::IAM::Role
+    Properties:
+      AssumeRolePolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service: ec2.amazonaws.com
+            Action: sts:AssumeRole
+      ManagedPolicyArns:
+        - arn:aws:iam::aws:policy/AmazonSSMManagedInstanceCore
+  EC2InstanceProfile:
+    Type: AWS::IAM::InstanceProfile
+    Properties:
+      Roles:
+        - !Ref SSMRole
