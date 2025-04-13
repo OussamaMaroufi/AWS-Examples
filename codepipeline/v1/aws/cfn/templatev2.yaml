@@ -1,20 +1,20 @@
 AWSTemplateFormatVersion: '2010-09-09'
-Description: CodePipeline for Express.js application with EC2 deployment and
-  CodeCommit repository
+Description: CodePipeline for Express.js application with EC2 deployment using GitHub as source
 
 Parameters:
-  CodeCommitRepoName:
+  GitHubRepo:
     Type: String
-    Description: Name of the CodeCommit repository to be created
+    Description: GitHub repository name in format 'owner/repo'
+  GitHubBranch:
+    Type: String
+    Description: Branch to monitor
+    Default: main
+  GitHubOAuthToken:
+    Type: String
+    Description: GitHub OAuth token with repo access
+    NoEcho: true
 
 Resources:
-  CodeCommitRepository:
-    # https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-codecommit-repository.html
-    Type: AWS::CodeCommit::Repository
-    Properties:
-      RepositoryName: !Ref CodeCommitRepoName
-      RepositoryDescription: Repository for Express.js application
-
   CodePipelineArtifactStore:
     Type: AWS::S3::Bucket
     Properties:
@@ -39,21 +39,9 @@ Resources:
               - Effect: Allow
                 Action:
                   - s3:*
-                  - codecommit:CancelUploadArchive
-                  - codecommit:GetBranch
-                  - codecommit:GetCommit
-                  - codecommit:GetUploadArchiveStatus
-                  - codecommit:UploadArchive
-                  - codecommit:GetBranch
-                Resource: '*'
-              - Effect: Allow
-                Action:
-                  - codecommit:GetBranch
-                  - codecommit:GetCommit
-                  - codecommit:GetRepository
-                  - codecommit:ListBranches
-                  - codecommit:ListRepositories
-                Resource: !GetAtt CodeCommitRepository.Arn
+                Resource:
+                  - !GetAtt CodePipelineArtifactStore.Arn
+                  - !Sub ${CodePipelineArtifactStore.Arn}/*
               - Effect: Allow
                 Action:
                   - codebuild:BatchGetBuilds
@@ -67,6 +55,11 @@ Resources:
                   - codedeploy:GetDeploymentConfig
                   - codedeploy:RegisterApplicationRevision
                 Resource: '*'
+              # Added permissions for GitHub access via CodeStar connection
+              - Effect: Allow
+                Action:
+                  - codestar-connections:UseConnection
+                Resource: !Sub arn:aws:codestar-connections:${AWS::Region}:${AWS::AccountId}:connection/*
 
   CodeBuildServiceRole:
     Type: AWS::IAM::Role
@@ -98,10 +91,6 @@ Resources:
                   - s3:PutObject
                 Resource:
                   - !Sub ${CodePipelineArtifactStore.Arn}/*
-              - Effect: Allow
-                Action:
-                  - codecommit:GitPull
-                Resource: !GetAtt CodeCommitRepository.Arn
 
   CodeDeployServiceRole:
     Type: AWS::IAM::Role
@@ -116,8 +105,13 @@ Resources:
       ManagedPolicyArns:
         - arn:aws:iam::aws:policy/service-role/AWSCodeDeployRole
 
+  GitHubConnection:
+    Type: AWS::CodeStarConnections::Connection
+    Properties:
+      ConnectionName: my-github-connection
+      ProviderType: GitHub
+
   CodeBuildProject:
-    # https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-codebuild-project.html
     Type: AWS::CodeBuild::Project
     Properties:
       ServiceRole: !GetAtt CodeBuildServiceRole.Arn
@@ -132,13 +126,11 @@ Resources:
         BuildSpec: buildspec.yml
 
   CodeDeployApplication:
-    # https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-codedeploy-application.html
     Type: AWS::CodeDeploy::Application
     Properties:
       ComputePlatform: Server
 
   CodeDeployDeploymentGroup:
-    # https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-codedeploy-deploymentgroup.html
     Type: AWS::CodeDeploy::DeploymentGroup
     Properties:
       ApplicationName: !Ref CodeDeployApplication
@@ -149,8 +141,8 @@ Resources:
               - Key: DeploymentGroup
                 Type: KEY_AND_VALUE
                 Value: Group1
+
   CodePipeline:
-    # https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-codepipeline-pipeline.html
     Type: AWS::CodePipeline::Pipeline
     Properties:
       RoleArn: !GetAtt CodePipelineServiceRole.Arn
@@ -160,15 +152,17 @@ Resources:
       Stages:
         - Name: Source
           Actions:
-            - Name: SourceAction
+            - Name: GitHub_Source
               ActionTypeId:
                 Category: Source
                 Owner: AWS
                 Version: 1
-                Provider: CodeCommit
+                Provider: CodeStarSourceConnection
               Configuration:
-                RepositoryName: !Ref CodeCommitRepoName
-                BranchName: master
+                ConnectionArn: !GetAtt GitHubConnection.ConnectionArn
+                FullRepositoryId: !Ref GitHubRepo
+                BranchName: !Ref GitHubBranch
+                DetectChanges: true
               OutputArtifacts:
                 - Name: SourceOutput
               RunOrder: 1
@@ -189,8 +183,6 @@ Resources:
               RunOrder: 1
         - Name: Deploy
           Actions:
-            # https://docs.aws.amazon.com/codepipeline/latest/userguide/reference-pipeline-structure.html#actions-valid-providers
-            # https://docs.aws.amazon.com/codepipeline/latest/userguide/reference-pipeline-structure.html#reference-action-artifacts
             - Name: DeployAction
               ActionTypeId:
                 Category: Deploy
@@ -205,9 +197,6 @@ Resources:
               RunOrder: 1
 
 Outputs:
-  CodeCommitRepoUrl:
-    Value: !GetAtt CodeCommitRepository.CloneUrlHttp
-    Description: CodeCommit Repository URL
   PipelineUrl:
     Value: !Sub https://console.aws.amazon.com/codepipeline/home?region=${AWS::Region}#/view/${CodePipeline}
     Description: CodePipeline URL
